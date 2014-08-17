@@ -50,6 +50,17 @@ module.exports = Backbone.View.extend({
         // Populate template with data
         this.$el.html( template( { images: this.oImageCache[this.options.sObfuscated] } ) );
 
+        // Loop each of the images and fade them in
+        this.$el.find('img').each(function (i) {
+            // Set the current element
+            var elImg = $(this);
+            // Set a timeout so that each image comes in slightly after the last
+            setTimeout(function () {                
+                // Add the fadeIn class to enable the CSS animation
+                elImg.addClass('fadeIn');
+            }, i * 200);
+        });
+
         // Enable chaining
         return this;
     },

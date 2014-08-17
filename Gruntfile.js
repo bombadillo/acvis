@@ -48,6 +48,7 @@ module.exports = function(grunt) {
 			app: {
 				files: {
 					'js/app.bundle.js': ['js/app.js'],
+					'js/app.bundle.test.js': ['js/app.test.js']
 				},
 				options: {
 					transform: ['jstify']

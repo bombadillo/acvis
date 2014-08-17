@@ -68,5 +68,9 @@ The tasks used within this case are:
 
 We call the JSHint task for error/syntax checking, Browserify to bundle all our JavaScript into one file, LESS to compile our CSS and CSSMin to concatenate all our CSS into one file.
 
+### Testing
+
+Tests are completed using QUnit. The test cases can be found in js/app.test.js and the tests can be viewed in test.html.
+
 ## License
 MIT

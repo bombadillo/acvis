@@ -16,6 +16,9 @@ module.exports = Backbone.View.extend({
     // Array will hold the eventual pool of images
     oImageCache: {},
 
+    // Integer to keep count of loaded images
+    currentImageLoadCount: 0,
+
     // Array to hold all possible images
     aPossibleImages: [
         'http://imagecache.arnoldclark.com/imageserver/%ref/350/i/',
@@ -67,6 +70,9 @@ module.exports = Backbone.View.extend({
 
     getImages: function () {
 
+        // Reset image load count
+        this.currentImageLoadCount = 0;
+
         // Check to see if cache for obfuscated ref exists
         if (this.oImageCache[this.options.sObfuscated]) {
             // Call render function
@@ -91,24 +97,40 @@ module.exports = Backbone.View.extend({
             // Replace the placeholder string with the obfuscated ref
             var sImageUrl = this.aPossibleImages[i].replace('%ref', this.options.sObfuscated);
             
-            // Create new image object
-            var img = new Image();
-
-            // Set the source to the current item
-            img.src = sImageUrl;
-
-            // Wait for image to load
-            img.onLoad = this.onImageLoad(img, i);            
+            // Call function to create image
+            this.createImage(sImageUrl);     
         }
         // END loop
     },
 
-    onImageLoad: function (img, i) {
-        // Add the src of the image to the array
-        this.oImageCache[this.options.sObfuscated].push(img.src);   
+    createImage: function (sImageUrl) {
+        // Create new image object
+        var img = new Image();
+        
+        // Set scope
+        var $this = this;
 
-        // If the count is equal to the length of the possible images, call render function
-        if (i === this.aPossibleImages.length - 1) this.render();  
+        // Set the source to the current item
+        img.src = sImageUrl;
+
+        // Set load and error event listeners
+        $(img).load( function (){
+            // Increment the load count
+            $this.currentImageLoadCount++;
+
+            // Add the src of the image to the array
+            $this.oImageCache[$this.options.sObfuscated].push(sImageUrl);   
+
+            // If the count is equal to the length of the possible images, call render function
+            if ($this.currentImageLoadCount === $this.aPossibleImages.length) $this.render();  
+        })
+        .error( function () {
+            // Increment the load count
+            $this.currentImageLoadCount++;
+
+            // If the count is equal to the length of the possible images, call render function
+            if ($this.currentImageLoadCount === $this.aPossibleImages.length) $this.render();  
+        });  
     }
 
 });

@@ -1,0 +1,23 @@
+<div class="col-xs-12">
+	<div class="images container">
+		<div class="row">
+
+		<% var count = 0; %>
+			<% _.each(images, function (image) { %>
+
+				<% count++; %>
+
+				<div class="col-xs-4"><img src="<%= image %>"></div>
+
+				<% if (count !== 0 && count % 3 === 0) { %>
+
+					</div>
+					<div class="row">
+
+				<% } %>
+
+			<% }); %>
+
+		</div>
+	</div>
+</div>

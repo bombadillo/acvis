@@ -13,29 +13,27 @@ Backbone.$ = $;
 // Set the view as the module export
 module.exports = Backbone.View.extend({
 
-	// Array will hold the eventual pool of images
-	aImages: [],
+    // Array will hold the eventual pool of images
+    oImageCache: {},
 
-	// Array to hold all possible images
-	aPossibleImages: [
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/i/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/6/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/f/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/4/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/5/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/350/r/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/4/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/i/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/6/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/f/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/5/',
-		'http://imagecache.arnoldclark.com/imageserver/%ref/800/r/'
-	],
+    // Array to hold all possible images
+    aPossibleImages: [
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/i/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/6/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/f/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/4/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/5/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/350/r/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/4/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/i/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/6/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/f/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/5/',
+        'http://imagecache.arnoldclark.com/imageserver/%ref/800/r/'
+    ],
  
-	// Is called at instantiation
+    // Is called at instantiation
     initialize: function (options) {
-        // Log status
-        utils.log("Results", "viewRender");
 
         // Replace the view's defaults with the passed in options
         this.options = _.defaults(options || {}, this.options);
@@ -45,10 +43,12 @@ module.exports = Backbone.View.extend({
     },  
 
     // Populates the view's element with the new HTML
-    render: function () {     	
+    render: function () {      
+        // Log status
+        utils.log("Results", "viewRender");
 
-    	// Populate template with data
-        this.$el.html( template( { images: this.aImages } ) );
+        // Populate template with data
+        this.$el.html( template( { images: this.oImageCache[this.options.sObfuscated] } ) );
 
         // Enable chaining
         return this;
@@ -56,23 +56,48 @@ module.exports = Backbone.View.extend({
 
     getImages: function () {
 
-    	// Loop each of the array items
-    	for ( var i = 0; i < this.aPossibleImages.length; i++ ) {
-    		// Replace the placeholder string with the obfuscated ref
-    		this.aPossibleImages[i] = this.aPossibleImages[i].replace('%ref', this.options.sObfuscated);
-    		
-    		// Create new image object
-			var img = new Image();
-			// Set the source to the current item
-			img.src = this.aPossibleImages[i];
+        // Check to see if cache for obfuscated ref exists
+        if (this.oImageCache[this.options.sObfuscated]) {
+            // Call render function
+            this.render();
 
-			// If the height does not equal 0 we have an image
-			if (img.height !== 0) this.aImages.push(this.aPossibleImages[i]);
-    	}
-    	// END loop
+            // Log that we're using cache
+            utils.log('use cache');
+            
+            // Prevent further execution
+            return false;
+        }
+        
+        // Log that we're querying server
+        utils.log('search server');
+        
+        // If we're here then the cache does not exist. Let's create one
+        this.oImageCache[this.options.sObfuscated] = [];
 
-    	// Call function to render the view
-    	this.render();
+        // Loop each of the array items
+        for ( var i = 0; i < this.aPossibleImages.length; i++ ) {
+
+            // Replace the placeholder string with the obfuscated ref
+            var sImageUrl = this.aPossibleImages[i].replace('%ref', this.options.sObfuscated);
+            
+            // Create new image object
+            var img = new Image();
+
+            // Set the source to the current item
+            img.src = sImageUrl;
+
+            // Wait for image to load
+            img.onLoad = this.onImageLoad(img, i);            
+        }
+        // END loop
+    },
+
+    onImageLoad: function (img, i) {
+        // Add the src of the image to the array
+        this.oImageCache[this.options.sObfuscated].push(img.src);   
+
+        // If the count is equal to the length of the possible images, call render function
+        if (i === this.aPossibleImages.length - 1) this.render();  
     }
 
 });

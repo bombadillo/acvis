@@ -68,6 +68,7 @@ module.exports = Backbone.View.extend({
         return this;
     },
 
+    // Gets the images for the obfuscated string. Will use cache if it exists
     getImages: function () {
 
         // Reset image load count
@@ -103,6 +104,7 @@ module.exports = Backbone.View.extend({
         // END loop
     },
 
+    // Creates an image object and listens for load/error events
     createImage: function (sImageUrl) {
         // Create new image object
         var img = new Image();

@@ -37,6 +37,7 @@ module.exports = Backbone.View.extend({
         return this;
     },
 
+    // Handles the form submission. 
     onFormSubmit: function (e) {
         // Prevent form from submitting
         e.preventDefault();
@@ -85,10 +86,11 @@ module.exports = Backbone.View.extend({
         var aRefs = sRef.split(' ');
 
         // Call function to Obfuscate the two strings
-        this.ObfuscateRefs(aRefs[0], aRefs[1]);
+        this.obfuscateRefs(aRefs[0], aRefs[1]);
     },
 
-    ObfuscateRefs: function (sReg, sStock) {
+    // Obfuscate the refs and trigger event passing the new string
+    obfuscateRefs: function (sReg, sStock) {
 
         // Reverse the reg no
         var sReveredReg = sReg.split('').reverse().join('');

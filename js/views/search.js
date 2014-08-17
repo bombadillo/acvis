@@ -15,9 +15,7 @@ module.exports = Backbone.View.extend({
 
 	// Is called at instantiation
     initialize: function () {
-        // Log status
-        utils.log("Search", "viewRender");
- 
+
         // Call function to render the view
         this.render();
     },  
@@ -29,7 +27,9 @@ module.exports = Backbone.View.extend({
 
     // Populates the view's element with the new HTML
     render: function () {     	
-
+        // Log status
+        utils.log("Search", "viewRender");
+        
     	// Populate template with data
         this.$el.html( template() );
 
